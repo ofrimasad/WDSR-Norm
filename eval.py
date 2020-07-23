@@ -81,7 +81,7 @@ if __name__ == '__main__':
         model = WDSR_B(args).to(device)
     elif args.model == 'WDSR-A':
         model = WDSR_A(args).to(device)
-    elif args.model == 'WDSR-A':
+    elif args.model == 'WDSR-Deconv':
         model = WDSR_Deconv(args).to(device)
     else:
         model = WDSR_Norm_Deconv(args).to(device)
