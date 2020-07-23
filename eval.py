@@ -5,7 +5,7 @@ import torch.backends.cudnn as cudnn
 from torch.utils.data.dataloader import DataLoader
 
 from core.option import parser
-from core.model import WDSR_A, WDSR_B
+from core.model import WDSR_A, WDSR_B, WDSR_Deconv, WDSR_Norm_Deconv
 from core.data.div2k import DIV2K
 from core.data.utils import quantize
 from core.utils import AverageMeter, calc_psnr, load_checkpoint, load_weights
@@ -79,8 +79,12 @@ if __name__ == '__main__':
     # Create model
     if args.model == 'WDSR-B':
         model = WDSR_B(args).to(device)
-    else:
+    elif args.model == 'WDSR-A':
         model = WDSR_A(args).to(device)
+    elif args.model == 'WDSR-A':
+        model = WDSR_Deconv(args).to(device)
+    else:
+        model = WDSR_Norm_Deconv(args).to(device)
 
     # Load weights
     model = load_weights(model, load_checkpoint(args.checkpoint_file)['state_dict'])

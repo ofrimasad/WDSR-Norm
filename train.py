@@ -11,7 +11,7 @@ from torch.utils.data.dataloader import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
 from core.option import parser
-from core.model import WDSR_A, WDSR_B
+from core.model import WDSR_A, WDSR_B, WDSR_Deconv, WDSR_Norm_Deconv
 from core.data.div2k import DIV2K
 from core.data.utils import quantize
 from core.utils import AverageMeter, adjust_lr, calc_psnr, save_checkpoint
@@ -121,8 +121,12 @@ if __name__ == '__main__':
     # Create model
     if args.model == 'WDSR-B':
         model = WDSR_B(args).to(device)
-    else:
+    elif args.model == 'WDSR-A':
         model = WDSR_A(args).to(device)
+    elif args.model == 'WDSR-A':
+        model = WDSR_Deconv(args).to(device)
+    else:
+        model = WDSR_Norm_Deconv(args).to(device)
 
     print_information(model, args)
 
