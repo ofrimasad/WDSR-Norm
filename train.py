@@ -2,7 +2,7 @@ import os
 import random
 
 from tqdm import tqdm
-
+import numpy as np
 import torch
 from torch import nn
 import torch.optim as optim
@@ -97,7 +97,7 @@ def test(dataset, loader, model, criterion, args, tag=''):
             t.set_postfix(loss='{:.4f}'.format(losses.avg))
             t.update(lr.shape[0])
 
-        return losses.avg, psnr.avg
+        return losses.avg, psnr.avg, sr, hr
 
 
 if __name__ == '__main__':
@@ -167,7 +167,7 @@ if __name__ == '__main__':
         # Validate
         ######################
 
-        valid_loss, valid_psnr = test(valid_dataset, valid_dataloader, model, criterion, args, tag='valid')
+        valid_loss, valid_psnr, sr, hr = test(valid_dataset, valid_dataloader, model, criterion, args, tag='valid')
 
         is_best = valid_psnr > best_psnr
 
@@ -200,5 +200,7 @@ if __name__ == '__main__':
         summary_writer.add_scalar('learning_rate', lr, epoch + 1)
         summary_writer.add_scalars('loss', {'train': train_loss, 'valid': valid_loss}, epoch + 1)
         summary_writer.add_scalar('psnr', valid_psnr, epoch + 1)
+        im = np.stack((255-sr.squeeze().numpy(), 255-hr.squeeze().numpy()))
+        summary_writer.add_images('results', im, epoch + 1)
 
     summary_writer.close()

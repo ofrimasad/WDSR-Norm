@@ -13,6 +13,7 @@ parser.add_argument('--n-res-blocks', type=int, default=16)
 parser.add_argument('--expansion-ratio', type=int, default=4)
 parser.add_argument('--low-rank-ratio', type=float, default=0.8)
 parser.add_argument('--res-scale', type=float, default=1.0)
+parser.add_argument('--debug', type=bool, default=False)
 
 ################################
 # Pre-processing, Post-processing Options

@@ -8,6 +8,7 @@ class DIV2K(object):
     def __init__(self, args, train, n_pairs=None):
         self.args = args
         self.train = train
+        self.debug = args.debug
 
         if not n_pairs:
             self.n_pairs = 800 if self.train else 100
@@ -62,6 +63,8 @@ class DIV2K(object):
         return True
 
     def __len__(self):
+        if self.debug:
+            return 1
         if self.train:
             repeat = self.args.batch_size * self.args.iterations_per_epoch // self.n_pairs
         else:
