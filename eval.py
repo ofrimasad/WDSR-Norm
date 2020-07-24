@@ -1,3 +1,5 @@
+import os
+
 from tqdm import tqdm
 
 import torch
@@ -9,7 +11,8 @@ from core.model import WDSR_A, WDSR_B, WDSR_Deconv, WDSR_Norm_Deconv
 from core.data.div2k import DIV2K
 from core.data.utils import quantize
 from core.utils import AverageMeter, calc_psnr, load_checkpoint, load_weights
-
+from PIL import Image
+import numpy as np
 
 def forward(x):
     with torch.no_grad():
@@ -44,6 +47,7 @@ def test(dataset, loader, model, args, device, tag=''):
     with tqdm(total=len(dataset)) as t:
         t.set_description(tag)
 
+        count = 0
         for data in loader:
             lr, hr = data
             lr = lr.to(device)
@@ -56,6 +60,13 @@ def test(dataset, loader, model, args, device, tag=''):
 
             # Quantize results
             sr = quantize(sr, args.rgb_range)
+
+            if args.output_dir:
+                im = Image.fromarray(np.uint8(sr.squeeze().cpu().numpy().transpose(2,1,0)))
+                im_lr = Image.fromarray(np.uint8(lr.squeeze().cpu().numpy().transpose(2, 1, 0)))
+                im.save(args.output_dir + str(count) + ".png")
+                im_lr.save(args.output_dir + str(count) + "_lr.png")
+                count += 1
 
             # Update PSNR
             psnr.update(calc_psnr(sr, hr, scale=args.scale, max_value=args.rgb_range[1]), lr.shape[0])
@@ -70,11 +81,15 @@ if __name__ == '__main__':
     parser.add_argument('--dataset-dir', type=str, required=True, help='DIV2K Dataset Root Directory')
     parser.add_argument('--checkpoint-file', type=str, required=True)
     parser.add_argument('--self-ensemble', action='store_true')
+    parser.add_argument('--output-dir', type=str, required=False)
     args = parser.parse_args()
 
     # Set cuDNN auto-tuner and get device
     cudnn.benchmark = True
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
+    if args.output_dir is not None and not os.path.exists(args.output_dir):
+        os.makedirs(args.output_dir)
 
     # Create model
     if args.model == 'WDSR-B':
@@ -93,4 +108,4 @@ if __name__ == '__main__':
     dataset = DIV2K(args, train=False)
     dataloader = DataLoader(dataset=dataset, batch_size=1)
 
-    test(dataset, dataloader, model, device, args)
+    test(dataset, dataloader, model, args, device)

@@ -97,7 +97,7 @@ def test(dataset, loader, model, criterion, args, tag=''):
             t.set_postfix(loss='{:.4f}'.format(losses.avg))
             t.update(lr.shape[0])
 
-        return losses.avg, psnr.avg, sr, hr
+        return losses.avg, psnr.avg, sr, hr, lr
 
 
 if __name__ == '__main__':
@@ -167,7 +167,7 @@ if __name__ == '__main__':
         # Validate
         ######################
 
-        valid_loss, valid_psnr, sr, hr = test(valid_dataset, valid_dataloader, model, criterion, args, tag='valid')
+        valid_loss, valid_psnr, sr, hr, low_res = test(valid_dataset, valid_dataloader, model, criterion, args, tag='valid')
 
         is_best = valid_psnr > best_psnr
 
