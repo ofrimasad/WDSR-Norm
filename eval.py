@@ -13,6 +13,7 @@ from core.data.utils import quantize
 from core.utils import AverageMeter, calc_psnr, load_checkpoint, load_weights
 from PIL import Image
 import numpy as np
+from core.data.dir_dataset import DirDataSet
 
 def forward(x):
     with torch.no_grad():
@@ -69,7 +70,7 @@ def test(dataset, loader, model, args, device, tag=''):
                 count += 1
 
             # Update PSNR
-            psnr.update(calc_psnr(sr, hr, scale=args.scale, max_value=args.rgb_range[1]), lr.shape[0])
+            #psnr.update(calc_psnr(sr, hr, scale=args.scale, max_value=args.rgb_range[1]), lr.shape[0])
 
             t.update(lr.shape[0])
 
@@ -105,7 +106,8 @@ if __name__ == '__main__':
     model = load_weights(model, load_checkpoint(args.checkpoint_file)['state_dict'])
 
     # Prepare dataset
-    dataset = DIV2K(args, train=False)
+    dataset = DirDataSet('data/checkers')
+    #dataset = DIV2K(args, train=False)
     dataloader = DataLoader(dataset=dataset, batch_size=1)
 
     test(dataset, dataloader, model, args, device)

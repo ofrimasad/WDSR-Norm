@@ -200,7 +200,7 @@ if __name__ == '__main__':
         summary_writer.add_scalar('learning_rate', lr, epoch + 1)
         summary_writer.add_scalars('loss', {'train': train_loss, 'valid': valid_loss}, epoch + 1)
         summary_writer.add_scalar('psnr', valid_psnr, epoch + 1)
-        im = np.stack((255-sr.squeeze().cpu().numpy(), 255-hr.squeeze().cpu().numpy()))
-        summary_writer.add_images('results', im, epoch + 1)
+        #im = np.stack((255-sr.squeeze().cpu().numpy(), 255-hr.squeeze().cpu().numpy()))
+        #summary_writer.add_images('results', im, epoch + 1)
 
     summary_writer.close()
