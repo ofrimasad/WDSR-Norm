@@ -125,8 +125,10 @@ if __name__ == '__main__':
         model = WDSR_A(args).to(device)
     elif args.model == 'WDSR-Deconv':
         model = WDSR_Deconv(args).to(device)
-    else:
+    elif args.model == 'WDSR-Norm-Deconv':
         model = WDSR_Norm_Deconv(args).to(device)
+    else:
+        raise Exception('model type not found')
 
     print_information(model, args)
 

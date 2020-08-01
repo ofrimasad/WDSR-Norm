@@ -26,7 +26,7 @@ class WDSR_Norm_Deconv(nn.Module):
             tail = [NormConvTranspose2d(args.n_feats, 3, kernel_size=3, stride=args.scale, padding=1,
                                         output_padding=args.scale-1)]
         else:
-            tail = [NormConvTranspose2d(args.n_feats, 3, kernel_size=5, stride=args.scale, padding=1,
+            tail = [NormConvTranspose2d(args.n_feats, 3, kernel_size=5, stride=args.scale, padding=2,
                                         output_padding=args.scale-1)]
 
         skip = [NormConvTranspose2d(3, 3, kernel_size=5, stride=args.scale, padding=2, output_padding=args.scale-1)]
