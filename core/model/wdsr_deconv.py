@@ -23,10 +23,11 @@ class WDSR_Deconv(nn.Module):
         body = [ResBlock(args.n_feats, args.expansion_ratio, args.res_scale) for _ in range(args.n_res_blocks)]
 
         if args.scale < 4:
-            tail = [nn.ConvTranspose2d(args.n_feats, 3, kernel_size=3, stride=args.scale, padding=1, output_padding=args.scale-1)]
+            tail = [nn.ConvTranspose2d(args.n_feats, 3, kernel_size=3, stride=args.scale, padding=1,
+                                       output_padding=args.scale-1)]
         else:
-            tail = [nn.ConvTranspose2d(args.n_feats, args.n_feats, kernel_size=3, stride=2, padding=1,output_padding=1),
-                    nn.ConvTranspose2d(args.n_feats, 3, kernel_size=3, stride=2, padding=1, output_padding=1)]
+            tail = [nn.ConvTranspose2d(args.n_feats, 3, kernel_size=5, stride=args.scale, padding=1,
+                                       output_padding=args.scale-1)]
         skip = [nn.ConvTranspose2d(3, 3, kernel_size=5, stride=args.scale, padding=2, output_padding=args.scale-1)]
 
         self.head = nn.Sequential(*head)
