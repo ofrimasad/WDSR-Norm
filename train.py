@@ -12,6 +12,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 from core.option import parser
 from core.model import WDSR_A, WDSR_B, WDSR_Deconv, WDSR_Norm_Deconv
+from core.EDSR.edsr import EDSR
 from core.data.div2k import DIV2K
 from core.data.utils import quantize
 from core.utils import AverageMeter, adjust_lr, calc_psnr, save_checkpoint
@@ -123,6 +124,15 @@ if __name__ == '__main__':
         model = WDSR_B(args).to(device)
     elif args.model == 'WDSR-A':
         model = WDSR_A(args).to(device)
+    elif args.model == 'EDSR':
+        model = EDSR(args).to(device)
+    elif args.model == 'EDSR-Deconv':
+        args.deconv = True
+        model = EDSR(args).to(device)
+    elif args.model == 'EDSR-Norm-Deconv':
+        args.deconv = True
+        args.norm = True
+        model = EDSR(args).to(device)
     elif args.model == 'WDSR-Deconv':
         model = WDSR_Deconv(args).to(device)
     elif args.model == 'WDSR-Norm-Deconv':
