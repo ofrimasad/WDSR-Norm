@@ -6,6 +6,7 @@ import torch
 import torch.backends.cudnn as cudnn
 from torch.utils.data.dataloader import DataLoader
 
+from core.EDSR.edsr import EDSR
 from core.option import parser
 from core.model import WDSR_A, WDSR_B, WDSR_Deconv, WDSR_Norm_Deconv
 from core.data.div2k import DIV2K
@@ -97,6 +98,15 @@ if __name__ == '__main__':
         model = WDSR_B(args).to(device)
     elif args.model == 'WDSR-A':
         model = WDSR_A(args).to(device)
+    elif args.model == 'EDSR':
+        model = EDSR(args).to(device)
+    elif args.model == 'EDSR-Deconv':
+        args.deconv = True
+        model = EDSR(args).to(device)
+    elif args.model == 'EDSR-Norm-Deconv':
+        args.deconv = True
+        args.norm = True
+        model = EDSR(args).to(device)
     elif args.model == 'WDSR-Deconv':
         model = WDSR_Deconv(args).to(device)
     else:
