@@ -15,7 +15,7 @@ from core.model import WDSR_A, WDSR_B, WDSR_Deconv, WDSR_Norm_Deconv
 from core.EDSR.edsr import EDSR
 from core.data.div2k import DIV2K
 from core.data.utils import quantize
-from core.utils import AverageMeter, adjust_lr, calc_psnr, save_checkpoint
+from core.utils import AverageMeter, adjust_lr, calc_psnr, save_checkpoint, adjust_lr_cosine
 
 
 def print_information(model, args):
@@ -165,7 +165,8 @@ if __name__ == '__main__':
 
     for epoch in range(args.epochs):
         # Adjust learning rate
-        lr = adjust_lr(optimizer, args.lr, epoch, args.lr_decay_steps, args.lr_decay_gamma)
+        # lr = adjust_lr(optimizer, args.lr, epoch, args.lr_decay_steps, args.lr_decay_gamma)
+        lr = adjust_lr_cosine(optimizer, args.lr, epoch, args.epochs)
 
         print('[epoch: {}/{}]'.format(epoch + 1, args.epochs))
 

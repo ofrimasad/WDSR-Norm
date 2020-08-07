@@ -1,6 +1,6 @@
 import torch
 import shutil
-
+import numpy as np
 
 class AverageMeter(object):
     def __init__(self):
@@ -33,6 +33,12 @@ def adjust_lr(optimizer, lr, step, decay_steps, decay_gamma):
         pg['lr'] = current_lr
     return current_lr
 
+
+def adjust_lr_cosine(optimizer, lr, step, max_step):
+    current_lr = lr * ((np.cos(step / max_step) + 1) / 2) + 1e-10
+    for pg in optimizer.param_groups:
+        pg['lr'] = current_lr
+    return current_lr
 
 def get_lr(optimizer):
     for pg in optimizer.param_groups:
