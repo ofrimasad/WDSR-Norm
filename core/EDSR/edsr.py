@@ -17,8 +17,8 @@ url = {
 class EDSR(nn.Module):
     def __init__(self, args):
         super(EDSR, self).__init__()
-        n_resblocks = 16
-        n_feats = 64
+        n_resblocks = 32
+        n_feats = 256
         scale = 4
         conv = common.default_conv
 
