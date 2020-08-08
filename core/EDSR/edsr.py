@@ -18,7 +18,7 @@ class EDSR(nn.Module):
     def __init__(self, args):
         super(EDSR, self).__init__()
         n_resblocks = 32
-        n_feats = 256
+        n_feats = 128
         scale = 4
         conv = common.default_conv
 
@@ -26,7 +26,7 @@ class EDSR(nn.Module):
         # n_feats = 64 * 4
         kernel_size = 3
         act = nn.ReLU(True)
-        self.url = url['r{}f{}x{}'.format(n_resblocks, n_feats, scale)]
+        # self.url = url['r{}f{}x{}'.format(n_resblocks, n_feats, scale)]
         self.sub_mean = common.MeanShift(1)
         self.add_mean = common.MeanShift(1, sign=1)
 
