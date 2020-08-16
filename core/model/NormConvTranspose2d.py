@@ -5,18 +5,21 @@ eps = 1e-10
 class NormConvTranspose2d(nn.ConvTranspose2d):
 
     def forward(self, input, output_size=None):
-        ones = torch.ones_like(input)
-        ones.requires_grad = False
-        x = super().forward(input, output_size)
-        normalizer = super().forward(ones, output_size)
-        unsqueezed_bias = self.bias.unsqueeze(0).unsqueeze(2).unsqueeze(3)
 
-        if normalizer.nonzero().size(0) < normalizer.numel():
-            normalizer += eps
+        if self.training or self.first_eval:
+            ones = torch.ones_like(input)
+            ones.requires_grad = False
+            x = super().forward(input, output_size)
+            self.normalizer = super().forward(ones, output_size)
+            self.unsqueezed_bias = self.bias.unsqueeze(0).unsqueeze(2).unsqueeze(3)
+            self.first_eval = self.training
 
-        x += unsqueezed_bias
-        x /= normalizer
-        x -= unsqueezed_bias
+        # if normalizer.nonzero().size(0) < normalizer.numel():
+        #     normalizer += eps
+
+        x += self.unsqueezed_bias
+        x /= self.normalizer
+        x -= self.unsqueezed_bias
 
         return x
 
