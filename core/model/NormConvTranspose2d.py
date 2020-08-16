@@ -1,7 +1,7 @@
 from torch import nn
 import torch
 
-
+eps = 1e-10
 class NormConvTranspose2d(nn.ConvTranspose2d):
 
     def forward(self, input, output_size=None):
@@ -9,7 +9,14 @@ class NormConvTranspose2d(nn.ConvTranspose2d):
         ones.requires_grad = False
         x = super().forward(input, output_size)
         normalizer = super().forward(ones, output_size)
-        x = x / normalizer
+        unsqueezed_bias = self.bias.unsqueeze(0).unsqueeze(2).unsqueeze(3)
+
+        if normalizer.nonzero().size(0) < normalizer.numel():
+            normalizer += eps
+
+        x += unsqueezed_bias
+        x /= normalizer
+        x -= unsqueezed_bias
 
         return x
 
