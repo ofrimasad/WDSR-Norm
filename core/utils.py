@@ -35,7 +35,7 @@ def adjust_lr(optimizer, lr, step, decay_steps, decay_gamma):
 
 
 def adjust_lr_cosine(optimizer, lr, step, max_step):
-    current_lr = lr * (np.cos((step / max_step) * np.pi) + 1) + 1e-10
+    current_lr = lr * (np.cos((step / max_step) * np.pi) + 1) / 2 + 1e-10
     for pg in optimizer.param_groups:
         pg['lr'] = current_lr
     return current_lr
