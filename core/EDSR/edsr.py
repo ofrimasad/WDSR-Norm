@@ -4,16 +4,6 @@ import torch
 import torch.nn as nn
 from core.model.NormConvTranspose2d import NormConvTranspose2d
 
-url = {
-    'r16f64x2': 'https://cv.snu.ac.kr/research/EDSR/models/edsr_baseline_x2-1bc95232.pt',
-    'r16f64x3': 'https://cv.snu.ac.kr/research/EDSR/models/edsr_baseline_x3-abf2a44e.pt',
-    'r16f64x4': 'https://cv.snu.ac.kr/research/EDSR/models/edsr_baseline_x4-6b446fab.pt',
-    'r32f256x2': 'https://cv.snu.ac.kr/research/EDSR/models/edsr_x2-0edfb8a3.pt',
-    'r32f256x3': 'https://cv.snu.ac.kr/research/EDSR/models/edsr_x3-ea3ef2c6.pt',
-    'r32f256x4': 'https://cv.snu.ac.kr/research/EDSR/models/edsr_x4-4f62e9ef.pt'
-}
-
-
 class EDSR(nn.Module):
     def __init__(self, args):
         super(EDSR, self).__init__()
@@ -22,11 +12,9 @@ class EDSR(nn.Module):
         scale = args.scale
         conv = common.default_conv
 
-               # n_resblocks = 16 * 2
-        # n_feats = 64 * 4
+
         kernel_size = 3
         act = nn.ReLU(True)
-        # self.url = url['r{}f{}x{}'.format(n_resblocks, n_feats, scale)]
         self.sub_mean = common.MeanShift(1)
         self.add_mean = common.MeanShift(1, sign=1)
 
@@ -34,7 +22,6 @@ class EDSR(nn.Module):
         if args.deconv:
             deconv = NormConvTranspose2d if args.norm else nn.ConvTranspose2d
             name = 'NormDedonv' if args.norm else 'Deconv'
-            # self.url = url['r{}f{}x{}_{}'.format(n_resblocks, n_feats, scale, name)]
 
         # define head module
         m_head = [conv(3, n_feats, kernel_size)]
