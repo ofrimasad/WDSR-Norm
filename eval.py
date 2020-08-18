@@ -70,6 +70,12 @@ def test(dataset, loader, model, args, device, tag=''):
                 im_lr.save(args.output_dir + str(count) + "_lr.png")
                 count += 1
 
+            # to save activation layers
+            # act = activation['deconv'].squeeze()
+            #
+            # for idx in range(50):
+            #     plt.imsave('results/output/act/activation%d_.png' % idx, act[idx], vmin=act[idx].min(), vmax=act[idx].max())
+
             # Update PSNR
             #psnr.update(calc_psnr(sr, hr, scale=args.scale, max_value=args.rgb_range[1]), lr.shape[0])
 
@@ -77,6 +83,11 @@ def test(dataset, loader, model, args, device, tag=''):
 
     print('DIV2K (val) PSNR: {:.4f} dB'.format(psnr.avg))
 
+# activation = {}
+# def get_activation(name):
+#     def hook(model, input, output):
+#         activation[name] = output.detach()
+#     return hook
 
 if __name__ == '__main__':
     # Define specific options and parse arguments
@@ -114,6 +125,9 @@ if __name__ == '__main__':
 
     # Load weights
     model = load_weights(model, load_checkpoint(args.checkpoint_file)['state_dict'])
+
+    # to see activation layers
+    # model.tail._modules['0'].register_forward_hook(get_activation('deconv'))
 
     # Prepare dataset
     dataset = DirDataSet('data/checkers')
