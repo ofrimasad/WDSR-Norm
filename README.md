@@ -98,6 +98,7 @@ python eval.py --dataset-dir "/YOUR_STORAGE_PATH/DIV2K" \
 
 
 
-<center><img src="./images/fig.png" /></center>
+## Results - examples
+<center><img src="./images/result_examples.png" /></center>
 
-
+The differences are very subtle but can be observed. [a] theoriginal image with marked cropped area, [b] the original crop, [c] the crop from a downsampledimages - the input for the network, [d] result of Pixel-Shuffling, [e] result of Deconvolution and [f]result of Normalized Deconvolution
