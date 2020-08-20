@@ -1,9 +1,8 @@
-# WDSR
+# Solving The Checkerboard Artifacts In Image Deconvolution
 
-This repository is implementation of the ["Wide Activation for Efficient and Accurate Image Super-Resolution"](https://arxiv.org/abs/1808.08718).
+This repository is implementation of the a final project for IDC's Image Understanding with Deep Learning course 2020.
 
-## Requirements
-
+## Requirements 
 - PyTorch 1.1.0
 - TensorBoard 1.14.0
 - Numpy 1.15.4
@@ -56,12 +55,12 @@ python train.py --dataset-dir "/YOUR_STORAGE_PATH/DIV2K" \
                 --lr 1e-3
 ```
 
-### WDSR-B Example
+### EDSR with norm deconv Example
 
 ```bash
 python train.py --dataset-dir "/YOUR_STORAGE_PATH/DIV2K" \
                 --output-dir "/YOUR_STORAGE_PATH/output" \
-                --model "WDSR-B" \
+                --model "EDSR-Norm-Deconv" \
                 --scale 2 \
                 --n-feats 32 \
                 --n-res-blocks 16 \
@@ -82,18 +81,23 @@ python eval.py --dataset-dir "/YOUR_STORAGE_PATH/DIV2K" \
                --checkpoint-file "/YOUR_STORAGE_PATH/output/WDSR-A-f32-b16-r4-x2-best.pth.tar"
 ```
 
-| Model | Scale | Residual Blocks | Parameters | PSNR | Pre-trained Model |
-|-------|-------|-----------------|------------|------|-------------------|
-| WDSR Baseline<sup> 1)</sup> | x2 | 16 | 1.19M | 34.67 dB | [Download](https://www.dropbox.com/s/nuiasqjw8kx241v/WDSR-A-f32-b16-r4-x2-best.pth.tar?dl=0) |
-| WDSR Baseline+<sup> 2)</sup> | x2 | 16 | 1.19M | 34.77 dB | - |
+| model |	upscale | Residual Blocksblock | Block depth |	parameters |	scale	 | PSNR  |
+|-------|---------|----------------------|-------------|-------------|---------|-------|
+|EDSR|	PixelShuffle|	32|	128|	10780675|	4	|29.04|
+|EDSR|	Deconvolution|	32|	128|	9895171|	4	|29.04|
+|EDSR|	NormDeconvolution|	32|	128|9895171|	4|	29.07|
+|WDSR|	PixelShuffle|	16|	32|	1203312	|4|	28.77|
+|WDSR|	Deconvolution|	16|	32|	1188327|	4|	28.86|
+|WDSR|	NormDeconvolution|	16|	32|	1188327|	4|	28.9|
+|WDSR|	PixelShuffle|	16|	32|	1195605	|3|	30.77|
+|WDSR|	Deconvolution|	16|	32|	1186791|	3|	30.76|
+|WDSR|	NormDeconvolution|	16|	32|	1186791|	3|	30.72|
+|WDSR|	PixelShuffle|	16|	32|	1190100|	2|	34.67|
+|WDSR|	Deconvolution|	16|	32|	1186791|	2|34.65|
+|WDSR|	NormDeconvolution|	16|	32|	1186791|2|	34.63|
 
-<sup>1)</sup> filters=32, res-blocks=16, expansion-ratio=4, res-scale=1.0<br />
-<sup>2)</sup> filters=32, res-blocks=16, expansion-ratio=4, res-scale=1.0, with self-ensemble<br />
+
 
 <center><img src="./images/fig.png" /></center>
 
-## References
 
-- Yu, Jiahui, et al. "Wide activation for efficient and accurate image super-resolution." arXiv preprint arXiv:1808.08718 (2018).
-- Fan, Yuchen, Jiahui Yu, and Thomas S. Huang. "Wide-activated deep residual networks based restoration for BPG-compressed images." Proc. IEEE Conf. Comput. Vis. Pattern Recognit. Workshops. 2018.
-- Lim, Bee, et al. "Enhanced deep residual networks for single image super-resolution." Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition Workshops. 2017.
