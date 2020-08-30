@@ -102,3 +102,23 @@ python eval.py --dataset-dir "/YOUR_STORAGE_PATH/DIV2K" \
 <center><img src="./images/result_examples.png" /></center>
 
 The differences are very subtle but can be observed. [a] theoriginal image with marked cropped area, [b] the original crop, [c] the crop from a downsampledimages - the input for the network, [d] result of Pixel-Shuffling, [e] result of Deconvolution and [f]result of Normalized Deconvolution
+
+
+## pretrained models
+models are located on a public S3:
+
+https://deconv-pretrained.s3.amazonaws.com/EDSR-Deconv-f128-b32-r4-x4-best.pth.tar  
+https://deconv-pretrained.s3.amazonaws.com/EDSR-Deconv-f32-b16-r4-x4-best.pth.tar  
+https://deconv-pretrained.s3.amazonaws.com/EDSR-Norm-Deconv-f128-b32-r4-x4-new-best.pth.tar  
+https://deconv-pretrained.s3.amazonaws.com/EDSR-Norm-Deconv-f32-b16-r4-x4-best.pth.tar  
+https://deconv-pretrained.s3.amazonaws.com/EDSR-f128-b32-r4-x4-best.pth.tar  
+https://deconv-pretrained.s3.amazonaws.com/EDSR-f32-b16-r4-x4-best.pth.tar  
+https://deconv-pretrained.s3.amazonaws.com/WDSR-A-f32-b16-r4-x2-best.pth.tar  
+https://deconv-pretrained.s3.amazonaws.com/WDSR-A-f32-b16-r4-x4-best.pth.tar  
+https://deconv-pretrained.s3.amazonaws.com/WDSR-Deconv-f32-b16-r4-x2-best.pth.tar  
+https://deconv-pretrained.s3.amazonaws.com/WDSR-Deconv-f32-b16-r4-x3-best.pth.tar  
+https://deconv-pretrained.s3.amazonaws.com/WDSR-Deconv-f32-b16-r4-x3_MSE-best.pth.tar  
+https://deconv-pretrained.s3.amazonaws.com/WDSR-Deconv-f32-b16-r4-x4-best.pth.tar  
+https://deconv-pretrained.s3.amazonaws.com/WDSR-Deconv-f32-b8-r4-x2-best.pth.tar  
+https://deconv-pretrained.s3.amazonaws.com/WDSR-Norm-Deconv-f32-b16-r4-x3_MSE-best.pth.tar  
+https://deconv-pretrained.s3.amazonaws.com/WDSR-Norm-Deconv-f32-b16-r4-x4-best.pth.tar  
