@@ -103,6 +103,8 @@ python eval.py --dataset-dir "/YOUR_STORAGE_PATH/DIV2K" \
 
 The differences are very subtle but can be observed. [a] theoriginal image with marked cropped area, [b] the original crop, [c] the crop from a downsampledimages - the input for the network, [d] result of Pixel-Shuffling, [e] result of Deconvolution and [f]result of Normalized Deconvolution
 
+# Example Jupyter Notebook 
+[demo.ipynb](demo.ipynb)
 
 ## pretrained models
 models are located on a public S3:
