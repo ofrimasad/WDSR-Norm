@@ -16,13 +16,14 @@ from PIL import Image
 import numpy as np
 from core.data.dir_dataset import DirDataSet
 
-def forward(x):
+
+def forward(x, model):
     with torch.no_grad():
         sr = model(x)
         return sr
 
 
-def forward_x8(x):
+def forward_x8(x, model):
     x = x.squeeze(0).permute(1, 2, 0)
 
     with torch.no_grad():
@@ -56,16 +57,16 @@ def test(dataset, loader, model, args, device, tag=''):
             hr = hr.to(device)
 
             if args.self_ensemble:
-                sr = forward_x8(lr)
+                sr = forward_x8(lr, model)
             else:
-                sr = forward(lr)
+                sr = forward(lr, model)
 
             # Quantize results
             sr = quantize(sr, args.rgb_range)
 
             if args.output_dir:
-                im = Image.fromarray(np.uint8(sr.squeeze().cpu().numpy().transpose(2,1,0)))
-                im_lr = Image.fromarray(np.uint8(lr.squeeze().cpu().numpy().transpose(2, 1, 0)))
+                im = Image.fromarray(np.uint8(sr.squeeze().cpu().numpy().transpose(2, 1, 0))).transpose(Image.ROTATE_270)
+                im_lr = Image.fromarray(np.uint8(lr.squeeze().cpu().numpy().transpose(2, 1, 0))).transpose(Image.ROTATE_270)
                 im.save(args.output_dir + str(count) + ".png")
                 im_lr.save(args.output_dir + str(count) + "_lr.png")
                 count += 1
@@ -77,7 +78,7 @@ def test(dataset, loader, model, args, device, tag=''):
             #     plt.imsave('results/output/act/activation%d_.png' % idx, act[idx], vmin=act[idx].min(), vmax=act[idx].max())
 
             # Update PSNR
-            #psnr.update(calc_psnr(sr, hr, scale=args.scale, max_value=args.rgb_range[1]), lr.shape[0])
+            # psnr.update(calc_psnr(sr, hr, scale=args.scale, max_value=args.rgb_range[1]), lr.shape[0])
 
             t.update(lr.shape[0])
 
@@ -131,7 +132,7 @@ if __name__ == '__main__':
 
     # Prepare dataset
     dataset = DirDataSet('data/checkers')
-    #dataset = DIV2K(args, train=False)
+    # dataset = DIV2K(args, train=False)
     dataloader = DataLoader(dataset=dataset, batch_size=1)
 
     test(dataset, dataloader, model, args, device)
