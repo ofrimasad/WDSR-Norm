@@ -1,69 +1,42 @@
-import numpy as np
 from torch import nn
-from core.data.dir_dataset import DirDataSet
 import torch
-from core.model.common import ShiftMean
 from matplotlib import pyplot as plt
+from torch.utils.data import DataLoader
+
+from core.data.dir_dataset import DirDataSet
+from core.model import NormConvTranspose2d
 from core.model.NormConvTranspose2d import NormConvTranspose2d
-import plotly.graph_objects as go
 
+eps = 1e-10
 
-# create deconv
-w = np.load('deconv_w.npy')
-b = np.load('deconv_b.npy')
-b_sum = np.sum(b)
+# create image
+img = torch.zeros((1, 3, 20, 20))
+img[0][0] = 0.8
+img[0][1] = 0.3
+img[0][2] = 0.2
+
+dataset = DirDataSet('images/sample')
+dataloader = DataLoader(dataset=dataset, batch_size=1)
+img = dataset.__getitem__(1)[0]
+
+img = img.unsqueeze(0) / 255.0
+
+plt.imshow(img.squeeze().permute(1, 2, 0))
 deconv = nn.ConvTranspose2d(3, 3, kernel_size=5, stride=4, padding=2, output_padding=3)
+norm_deconv = NormConvTranspose2d(3, 3, kernel_size=5, stride=4, padding=2, output_padding=3)
 
-deconv_inv = nn.ConvTranspose2d(3, 3, kernel_size=5, stride=4, padding=2, output_padding=3)
-deconv_one = nn.ConvTranspose2d(3, 3, kernel_size=5, stride=4, padding=2, output_padding=3)
-deconv_one_n = NormConvTranspose2d(3, 3, kernel_size=5, stride=4, padding=2, output_padding=3)
+rand_w = torch.randn(3, 3, 5, 5)
+deconv.weight.data = rand_w  # .fill_(0.4)
+norm_deconv.fill(rand_w)
+# norm_deconv_no_bias.weight.data = rand_w  # .fill_(0.4)
 
+res_deconv = deconv(img)*0.2
+res_deconv_norm = norm_deconv(img)*0.2
 
-deconv.weight.data = torch.Tensor(w)
-deconv.bias.data = torch.Tensor(b)
-
-deconv_inv.weight.data = torch.Tensor(w[:, ::-1,::-1,::-1].copy())
-deconv_inv.bias.data = torch.Tensor(b)
-
-deconv_one_n.transpose2d.weight.data.fill_(0.1)
-deconv_one_n.transpose2d.bias.data.fill_(0)
-
-deconv_one.weight.data.fill_(0.1)
-deconv_one.bias.data.fill_(0)
-# deconv_one.bias.data = torch.Tensor(b)
-
-# get image
-shift = ShiftMean([0.4488, 0.4371, 0.4040])
-dataset = DirDataSet('data/checkers')
-image_small, image_big = dataset.__getitem__(0)
-image_small = image_small.unsqueeze(0)
-image = shift(image_small, mode='sub')
-
-######################################
-
-ones_ = torch.ones_like(image)
-norm = deconv_one(ones_)
-norm_b = deconv_one(ones_)
-# infer
-res = deconv_one_n(image)
-b_tensor = torch.Tensor(b.reshape(1, 3, 1, 1).repeat(res.shape[2], axis=2).repeat(res.shape[3], axis=3))
-# res -= b_tensor
-# res /= norm
-# res += b_tensor
-
-######################################
-
-# show result
-res = shift(res, mode='add')
-res = res.detach().numpy().squeeze().transpose(2,1,0)/255.
-plt.imshow(res, interpolation='nearest')
-
-focus = res[600:700, 1000:1200]
-plt.imshow(focus, interpolation='nearest')
+plt.imshow(res_deconv.detach().squeeze().permute(1, 2, 0), vmin=0, vmax=10, interpolation='none')  # .permute(1, 2, 0))
 plt.show()
-# plt.imshow(norm_b.detach().numpy().squeeze().transpose(2,1,0)[600:700, 1000:1200], interpolation='nearest')
 
+plt.imshow(res_deconv_norm.detach().squeeze().permute(1, 2, 0), vmin=0, vmax=10, interpolation='none')  # .permute(1, 2, 0))
 plt.show()
-# fig = go.Figure().add_image(customdata=res)
-# fig.show()
-print('s')
+
+print('done')
