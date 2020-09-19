@@ -33,7 +33,7 @@ class NormConvTranspose2d(nn.Module):
     def forward(self, input, output_size=None):
 
         output = None
-        ones = torch.ones_like(input)
+        ones = torch.ones_like(input).to(input.device)
         for i in range(self.out_channels):
             x = self.sub_convs[i](input)
             normalizer = self.sub_convs[i].forward(ones)
