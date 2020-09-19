@@ -47,3 +47,8 @@ class NormConvTranspose2d(nn.Module):
 
         for i in range(self.out_channels):
             self.sub_convs[i].weight.data = tensor[i].unsqueeze(1)
+            
+    def to(self, *args, **kwargs):
+        super(NormConvTranspose2d, self).to(*args, **kwargs)
+        for conv in self.sub_convs:
+            conv.to(*args, **kwargs)
