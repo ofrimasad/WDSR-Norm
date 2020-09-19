@@ -39,7 +39,7 @@ class NormConvTranspose2d(nn.Module):
             x = self.sub_convs[i](input)
             normalizer = self.sub_convs[i].forward(ones)
             if output is None:
-                output = torch.Tensor(x.shape[0], self.out_channels, x.shape[2], x.shape[3])
+                output = torch.Tensor(x.shape[0], self.out_channels, x.shape[2], x.shape[3]).to(input.device)
             output[:, i, :, :] = torch.sum(x / normalizer, dim=1)
             if self._bias is not None:
                 output[:, i, :, :] += self._bias[i]
