@@ -1,6 +1,7 @@
-from typing import Union, Tuple
+from typing import Union, Tuple, Optional
 from torch import nn
 import torch
+from torch._C import device
 
 eps = 1e-10
 T = int
@@ -12,7 +13,7 @@ class NormConvTranspose2d(nn.Module):
                  stride: Union[T, Tuple[T, T]] = 1, padding: Union[T, Tuple[T, T]] = 0,
                  output_padding: Union[T, Tuple[T, T]] = 0, groups: int = 1, bias: bool = True, dilation: int = 1,
                  padding_mode: str = 'zeros'):
-        super().__init__()
+        super(NormConvTranspose2d, self).__init__()
 
         if groups != 1:
             raise NotImplementedError('NormConvTranspose2d is currently not implemented from groups != 1')
@@ -27,6 +28,7 @@ class NormConvTranspose2d(nn.Module):
             self.sub_convs.append(nn.ConvTranspose2d(in_channels, in_channels, kernel_size, stride, padding,
                                                      output_padding=output_padding, groups=in_channels, bias=False,
                                                      dilation=dilation, padding_mode=padding_mode))
+            self.add_module(str(i), self.sub_convs[i])
 
     def forward(self, input, output_size=None):
 
@@ -47,8 +49,6 @@ class NormConvTranspose2d(nn.Module):
 
         for i in range(self.out_channels):
             self.sub_convs[i].weight.data = tensor[i].unsqueeze(1)
-            
-    def to(self, *args, **kwargs):
-        super(NormConvTranspose2d, self).to(*args, **kwargs)
-        for conv in self.sub_convs:
-            conv.to(*args, **kwargs)
+
+
+
