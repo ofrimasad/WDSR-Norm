@@ -25,10 +25,11 @@ class NormConvTranspose2d(nn.Module):
 
         self.sub_convs = []
         for i in range(self.out_channels):
-            self.sub_convs.append(nn.ConvTranspose2d(in_channels, in_channels, kernel_size, stride, padding,
+            m = nn.ConvTranspose2d(in_channels, in_channels, kernel_size, stride, padding,
                                                      output_padding=output_padding, groups=in_channels, bias=False,
-                                                     dilation=dilation, padding_mode=padding_mode))
-            self.add_module(str(i), self.sub_convs[i])
+                                                     dilation=dilation, padding_mode=padding_mode)
+            self.sub_convs.append(m)
+            self.add_module(str(i), m)
 
     def forward(self, input, output_size=None):
 
