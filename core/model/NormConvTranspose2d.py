@@ -7,13 +7,13 @@ eps = 1e-10
 T = int
 
 
-class NormConvTranspose2d_old(nn.Module):
+class NormConvTranspose2d(nn.Module):
 
     def __init__(self, in_channels: int, out_channels: int, kernel_size: Union[T, Tuple[T, T]],
                  stride: Union[T, Tuple[T, T]] = 1, padding: Union[T, Tuple[T, T]] = 0,
                  output_padding: Union[T, Tuple[T, T]] = 0, groups: int = 1, bias: bool = True, dilation: int = 1,
                  padding_mode: str = 'zeros'):
-        super(NormConvTranspose2d_old, self).__init__()
+        super(NormConvTranspose2d, self).__init__()
 
         if groups != 1:
             raise NotImplementedError('NormConvTranspose2d is currently not implemented from groups != 1')
@@ -30,6 +30,7 @@ class NormConvTranspose2d_old(nn.Module):
                                                      dilation=dilation, padding_mode=padding_mode)
             self.sub_convs.append(m)
             self.add_module(str(i), m)
+        self.norm = nn.InstanceNorm2d(out_channels)
 
     def forward(self, input, output_size=None):
 
@@ -37,28 +38,29 @@ class NormConvTranspose2d_old(nn.Module):
         ones = torch.ones_like(input).to(input.device)
         for i in range(self.out_channels):
             x = self.sub_convs[i](input)
-            normalizer = self.sub_convs[i].forward(ones)
+            normalizer = self.sub_convs[i].forward(ones) + eps
             if output is None:
                 output = torch.Tensor(x.shape[0], self.out_channels, x.shape[2], x.shape[3]).to(input.device)
             output[:, i, :, :] = torch.sum(x / normalizer, dim=1)
             if self._bias is not None:
                 output[:, i, :, :] += self._bias[i]
-
+        output = self.norm(output)
         return output
 
-    def fill(self, tensor):
+    def fill(self, w, bias):
 
         for i in range(self.out_channels):
-            self.sub_convs[i].weight.data = tensor[i].unsqueeze(1)
+            self.sub_convs[i].weight.data = w[:,i].unsqueeze(1)
+        self._bias.data = bias
 
 
-class NormConvTranspose2d(nn.Module):
+class NormConvTranspose2d_new(nn.Module):
 
     def __init__(self, in_channels: int, out_channels: int, kernel_size: Union[T, Tuple[T, T]],
                  stride: Union[T, Tuple[T, T]] = 1, padding: Union[T, Tuple[T, T]] = 0,
                  output_padding: Union[T, Tuple[T, T]] = 0, groups: int = 1, bias: bool = True, dilation: int = 1,
                  padding_mode: str = 'zeros'):
-        super(NormConvTranspose2d, self).__init__()
+        super(NormConvTranspose2d_new, self).__init__()
 
         if groups != 1:
             raise NotImplementedError('NormConvTranspose2d is currently not implemented from groups != 1')
@@ -77,6 +79,8 @@ class NormConvTranspose2d(nn.Module):
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.ones = None
+
+        self.norm = nn.InstanceNorm2d(out_channels)
         # self.add_module("deconv", self.deconv)
 
 
@@ -88,12 +92,13 @@ class NormConvTranspose2d(nn.Module):
             self.ones = torch.ones_like(input).to(input.device)
 
         x = self.deconv(input)
-        normalizer = self.deconv(self.ones)
+        normalizer = self.deconv(self.ones) + eps
         x /= normalizer
         x = x.reshape(x.shape[0], self.in_channels, self.out_channels, x.shape[2], x.shape[3])
         x = torch.transpose(x, 1, 2)
         x = x.reshape(x.shape[0], self.in_channels * self.out_channels, x.shape[3], x.shape[4])
         x = self.sum(x)
+        x = self.norm(x)
 
         return x
 
