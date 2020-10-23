@@ -7,19 +7,19 @@ eps = 1e-10
 T = int
 
 
-class NormConvTranspose2d_o(nn.Module):
+class NormConvTranspose2d(nn.Module):
 
     def __init__(self, in_channels: int, out_channels: int, kernel_size: Union[T, Tuple[T, T]],
                  stride: Union[T, Tuple[T, T]] = 1, padding: Union[T, Tuple[T, T]] = 0,
                  output_padding: Union[T, Tuple[T, T]] = 0, groups: int = 1, bias: bool = True, dilation: int = 1,
                  padding_mode: str = 'zeros'):
-        super(NormConvTranspose2d_o, self).__init__()
+        super(NormConvTranspose2d, self).__init__()
 
         if groups != 1:
             raise NotImplementedError('NormConvTranspose2d is currently not implemented from groups != 1')
 
         self.out_channels = out_channels
-
+        self.weight = nn.Parameter(torch.rand(out_channels))
         if bias:
             self._bias = nn.Parameter(torch.zeros(out_channels))
 
@@ -41,10 +41,10 @@ class NormConvTranspose2d_o(nn.Module):
             normalizer = self.sub_convs[i].forward(ones) + eps
             if output is None:
                 output = torch.Tensor(x.shape[0], self.out_channels, x.shape[2], x.shape[3]).to(input.device)
-            output[:, i, :, :] = torch.sum(x / normalizer, dim=1)
+            output[:, i, :, :] = torch.sum((x * self.weight[i]) / normalizer, dim=1)
             if self._bias is not None:
                 output[:, i, :, :] += self._bias[i]
-        output = self.norm(output)
+
         return output
 
     def fill(self, w, bias):
@@ -54,13 +54,13 @@ class NormConvTranspose2d_o(nn.Module):
         self._bias.data = bias
 
 
-class NormConvTranspose2d(nn.Module):
+class NormConvTranspose2d_n(nn.Module):
 
     def __init__(self, in_channels: int, out_channels: int, kernel_size: Union[T, Tuple[T, T]],
                  stride: Union[T, Tuple[T, T]] = 1, padding: Union[T, Tuple[T, T]] = 0,
                  output_padding: Union[T, Tuple[T, T]] = 0, groups: int = 1, bias: bool = True, dilation: int = 1,
                  padding_mode: str = 'zeros'):
-        super(NormConvTranspose2d, self).__init__()
+        super(NormConvTranspose2d_n, self).__init__()
 
         if groups != 1:
             raise NotImplementedError('NormConvTranspose2d is currently not implemented from groups != 1')
