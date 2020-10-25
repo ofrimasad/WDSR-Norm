@@ -19,7 +19,7 @@ class NormConvTranspose2d(nn.Module):
             raise NotImplementedError('NormConvTranspose2d is currently not implemented from groups != 1')
 
         self.out_channels = out_channels
-        self.weight = nn.Parameter(torch.rand(out_channels))
+        self.weight = nn.Parameter(torch.rand(out_channels, in_channels))
         if bias:
             self._bias = nn.Parameter(torch.zeros(out_channels))
 
@@ -37,11 +37,12 @@ class NormConvTranspose2d(nn.Module):
         output = None
         ones = torch.ones_like(input).to(input.device)
         for i in range(self.out_channels):
-            x = self.sub_convs[i](input)
+            w_input = input * self.weight[i].unsqueeze(0).unsqueeze(2).unsqueeze(3)
+            x = self.sub_convs[i](w_input)
             normalizer = self.sub_convs[i].forward(ones) + eps
             if output is None:
                 output = torch.Tensor(x.shape[0], self.out_channels, x.shape[2], x.shape[3]).to(input.device)
-            output[:, i, :, :] = torch.sum((x * self.weight[i]) / normalizer, dim=1)
+            output[:, i, :, :] = torch.sum(x / normalizer, dim=1)
             if self._bias is not None:
                 output[:, i, :, :] += self._bias[i]
 
