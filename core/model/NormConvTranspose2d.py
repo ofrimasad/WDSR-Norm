@@ -2,7 +2,7 @@ from typing import Union, Tuple, Optional
 from torch import nn
 import torch
 from torch._C import device
-
+import numpy as np
 eps = 1e-10
 T = int
 
@@ -72,12 +72,15 @@ class NormConvTranspose2d(nn.Module):
         self.deconv = nn.ConvTranspose2d(in_channels, in_channels * out_channels, kernel_size, stride, padding,
                                                      output_padding=output_padding, groups=in_channels, bias=False,
                                                      dilation=dilation, padding_mode=padding_mode)
-        self.sum = nn.Conv2d(in_channels * out_channels, out_channels, 1, 1, 0, 1)
-        self.sum.weight.data.fill_(0)
-        for o_c in range(out_channels):
-            self.sum.weight.data[o_c, o_c::out_channels].fill_(1)
+        self.weight = nn.Parameter(torch.rand(1, out_channels*in_channels, 1, 1))
+        self.sum = nn.Conv2d(in_channels * out_channels, out_channels, kernel_size=1, groups=out_channels)
+        self.sum.weight.data.fill_(1)
         self.sum.weight.requires_grad = False  # we train the sum bias only
 
+        index = np.ndarray((in_channels * out_channels), dtype=np.long)
+        for i in range(out_channels):
+            index[i * in_channels: (i + 1) * in_channels] = np.arange(i, in_channels*out_channels, in_channels)
+        self.index = nn.Parameter(torch.LongTensor(index), requires_grad=False)
 
     def forward(self, input, output_size=None):
 
@@ -85,8 +88,10 @@ class NormConvTranspose2d(nn.Module):
 
         normalizer = torch.ones_like(input).to(input.device)
         x = self.deconv(input)
+        x *= self.weight
         normalizer = self.deconv(normalizer) + eps
         x /= normalizer
+        x = torch.index_select(x, dim=1, index=self.index)
         x = self.sum(x)
         return x
 
