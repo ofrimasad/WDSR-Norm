@@ -7,19 +7,19 @@ eps = 1e-10
 T = int
 
 
-class NormConvTranspose2d_n(nn.Module):
+class NormConvTranspose2d(nn.Module):
 
     def __init__(self, in_channels: int, out_channels: int, kernel_size: Union[T, Tuple[T, T]],
                  stride: Union[T, Tuple[T, T]] = 1, padding: Union[T, Tuple[T, T]] = 0,
                  output_padding: Union[T, Tuple[T, T]] = 0, groups: int = 1, bias: bool = True, dilation: int = 1,
                  padding_mode: str = 'zeros'):
-        super(NormConvTranspose2d_n, self).__init__()
+        super(NormConvTranspose2d, self).__init__()
 
         if groups != 1:
             raise NotImplementedError('NormConvTranspose2d is currently not implemented from groups != 1')
 
         self.out_channels = out_channels
-        self.weight = nn.Parameter(torch.rand(out_channels, in_channels))
+        self.weight = nn.Parameter(torch.rand(out_channels, 1, in_channels, 1, 1))
         if bias:
             self._bias = nn.Parameter(torch.zeros(out_channels))
 
@@ -30,14 +30,13 @@ class NormConvTranspose2d_n(nn.Module):
                                                      dilation=dilation, padding_mode=padding_mode)
             self.sub_convs.append(m)
             self.add_module(str(i), m)
-        self.norm = nn.InstanceNorm2d(out_channels)
 
-    def forward(self, input, output_size=None):
+    def forward(self, input: torch.Tensor, output_size=None):
 
         output = None
         ones = torch.ones_like(input).to(input.device)
         for i in range(self.out_channels):
-            w_input = input * self.weight[i].unsqueeze(0).unsqueeze(2).unsqueeze(3)
+            w_input = input * self.weight[i]
             x = self.sub_convs[i](w_input)
             normalizer = self.sub_convs[i].forward(ones) + eps
             if output is None:
@@ -55,13 +54,13 @@ class NormConvTranspose2d_n(nn.Module):
         self._bias.data = bias
 
 
-class NormConvTranspose2d(nn.Module):
+class NormConvTranspose2d_n(nn.Module):
 
     def __init__(self, in_channels: int, out_channels: int, kernel_size: Union[T, Tuple[T, T]],
                  stride: Union[T, Tuple[T, T]] = 1, padding: Union[T, Tuple[T, T]] = 0,
                  output_padding: Union[T, Tuple[T, T]] = 0, groups: int = 1, bias: bool = True, dilation: int = 1,
                  padding_mode: str = 'zeros'):
-        super(NormConvTranspose2d, self).__init__()
+        super(NormConvTranspose2d_n, self).__init__()
 
         if groups != 1:
             raise NotImplementedError('NormConvTranspose2d is currently not implemented from groups != 1')
