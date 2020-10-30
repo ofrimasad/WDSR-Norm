@@ -91,7 +91,15 @@ class DeconvUpsampler(nn.Sequential):
     def __init__(self, deconv, scale, n_feats, bn=False, act=False):
 
         m = []
-        if (scale & (scale - 1)) == 0:  # Is scale = 2^n?
+        if scale == 4:  # Is scale = 2^n?
+            m.append(deconv(n_feats, n_feats, kernel_size=5, stride=4, padding=1, output_padding=1))
+            if bn:
+                m.append(nn.BatchNorm2d(n_feats))
+            if act == 'relu':
+                m.append(nn.ReLU(True))
+            elif act == 'prelu':
+                m.append(nn.PReLU(n_feats))
+        elif (scale & (scale - 1)) == 0:  # Is scale = 2^n?
             for _ in range(int(math.log(scale, 2))):
                 m.append(deconv(n_feats, n_feats, kernel_size=3, stride=2, padding=1, output_padding=1))
                 if bn:
