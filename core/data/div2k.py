@@ -66,10 +66,9 @@ class DIV2K(object):
         if self.debug:
             return 1
         if self.train:
-            repeat = self.args.batch_size * self.args.iterations_per_epoch // self.n_pairs
+            return self.args.iterations_per_epoch * self.n_pairs // self.args.batch_size
         else:
-            repeat = 1
-        return self.n_pairs * repeat
+            return self.n_pairs
 
     def __getitem__(self, idx):
         idx = str(idx % self.n_pairs)

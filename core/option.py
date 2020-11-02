@@ -34,7 +34,7 @@ parser.add_argument('--augment_patch', type=bool, default=True)
 
 parser.add_argument('--batch-size', type=int, default=16)
 parser.add_argument('--epochs', type=int, default=300)
-parser.add_argument('--iterations-per-epoch', type=int, default=1000)
+parser.add_argument('--iterations-per-epoch', type=int, default=100)
 
 parser.add_argument('--lr', type=float, default=1e-3)
 parser.add_argument('--lr-decay-steps', type=int, default=200)
