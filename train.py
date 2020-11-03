@@ -39,7 +39,7 @@ def train(dataset, loader, model, criterion, optimizer, tag=''):
 
     # Set the model to training mode
     model.train()
-    scaler = GradScaler()
+    # scaler = GradScaler()
 
     with tqdm(total=len(dataset)) as t:
         t.set_description(tag)
@@ -50,18 +50,16 @@ def train(dataset, loader, model, criterion, optimizer, tag=''):
             hr = hr.to(device)
 
             # Predict results and calculate loss
-            with autocast():
-                sr = model(lr)
-                loss = criterion(sr, hr)
+            sr = model(lr)
+            loss = criterion(sr, hr)
 
             # Update loss
             losses.update(loss.item(), lr.shape[0])
 
             # Compute gradients and update parameters
             optimizer.zero_grad()
-            scaler.scale(loss).backward()
-            scaler.step(optimizer)
-            scaler.update()
+            loss.backward()
+            optimizer.step()
 
             t.set_postfix(loss='{:.4f}'.format(losses.avg))
             t.update(lr.shape[0])

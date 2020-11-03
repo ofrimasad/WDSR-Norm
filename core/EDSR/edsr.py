@@ -41,8 +41,7 @@ class EDSR(nn.Module):
             upsampler = common.Upsampler(conv, scale, n_feats, act=False)
 
         m_tail = [
-            upsampler,
-            conv(n_feats, 3, kernel_size)
+            upsampler
         ]
 
         self.head = nn.Sequential(*m_head)
